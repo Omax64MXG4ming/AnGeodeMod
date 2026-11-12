@@ -1,8 +1,9 @@
 
-name: Build Android64
+name: Build Geode Mod Android64
 
 on:
   workflow_dispatch:
+
   push:
     branches:
       - main
@@ -12,14 +13,14 @@ permissions:
 
 jobs:
   build:
-    name: Build Geode Android64
+    name: Build Android ARM64
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Mod
+      - name: Build Geode mod
         id: build
         uses: geode-sdk/build-geode-mod@main
         with:
@@ -27,7 +28,20 @@ jobs:
           sdk: given
           build-config: Release
 
-      - name: Upload Mod
+      - name: Verify output
+        shell: bash
+        run: |
+          set -e
+
+          echo "Build output:"
+          find "${{ steps.build.outputs.build-output }}" \
+            -maxdepth 1 -type f -name "*.geode"
+
+          test -n "$(find \
+            "${{ steps.build.outputs.build-output }}" \
+            -maxdepth 1 -type f -name "*.geode" -print -quit)"
+
+      - name: Upload Android64 artifact
         uses: actions/upload-artifact@v4
         with:
           name: MyMod-Android64
