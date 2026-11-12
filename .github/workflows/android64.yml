@@ -1,4 +1,5 @@
-name: Build Geode Mod Android64
+
+name: Build AnGeodeMod Android64
 
 on:
   workflow_dispatch:
@@ -10,12 +11,12 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build Android64
+  android64:
+    name: Build Android ARM64
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Android SDK
@@ -23,26 +24,21 @@ jobs:
         with:
           packages: platform-tools
 
-      - name: Install Android NDK 27.2
+      - name: Install NDK
         run: |
           sdkmanager --install "ndk;27.2.12479018"
 
-      - name: Verify NDK
-        run: |
-          ls "$ANDROID_SDK_ROOT/ndk/27.2.12479018"
-          ls "$ANDROID_SDK_ROOT/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
-
-      - name: Build Geode mod
+      - name: Build Geode Mod
         id: build
         uses: geode-sdk/build-geode-mod@main
         with:
           target: Android64
-          sdk: given
-          android-ndk-version: 27.2.12479018
+          sdk: nightly
           build-config: Release
+          android-ndk-version: 27.2.12479018
           use-cpm-cache: false
 
-      - name: Upload Android64
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: AnGeodeMod-Android64
