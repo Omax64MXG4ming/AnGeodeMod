@@ -18,26 +18,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install LLVM 19
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-19 lld-19 llvm-19
-
-          sudo ln -sf /usr/bin/clang-19 /usr/local/bin/clang
-          sudo ln -sf /usr/bin/clang++-19 /usr/local/bin/clang++
-          sudo ln -sf /usr/bin/llvm-ar-19 /usr/local/bin/llvm-ar
-
-          clang --version
-          clang++ --version
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
 
-      - name: Install NDK
+      - name: Install Android NDK
         run: |
-          sdkmanager --install "ndk;27.2.12479018"
+          sdkmanager --install "ndk;28.0.13004108"
+
+          $ANDROID_HOME/ndk/28.0.13004108/toolchains/llvm/prebuilt/linux-x86_64/bin/clang --version
 
       - name: Build Geode Mod
         id: build
@@ -46,7 +36,7 @@ jobs:
           target: Android64
           sdk: nightly
           build-config: Release
-          android-ndk-version: 27.2.12479018
+          android-ndk-version: 28.0.13004108
           use-cpm-cache: false
 
       - name: Upload artifact
