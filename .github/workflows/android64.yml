@@ -1,9 +1,7 @@
-
 name: Build Geode Mod Android64
 
 on:
   workflow_dispatch:
-
   push:
     branches:
       - main
@@ -13,12 +11,19 @@ permissions:
 
 jobs:
   build:
-    name: Build Android ARM64
+    name: Build Android64
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK 27.2
+        run: |
+          sdkmanager --install "ndk;27.2.12479018"
 
       - name: Build Geode mod
         id: build
@@ -26,26 +31,14 @@ jobs:
         with:
           target: Android64
           sdk: given
+          android-ndk-version: 27.2.12479018
           build-config: Release
-      - name: Install SDK binaries
-        run: geode sdk install-binaries
-      - name: Verify output
-        shell: bash
-        run: |
-          set -e
+          use-cpm-cache: false
 
-          echo "Build output:"
-          find "${{ steps.build.outputs.build-output }}" \
-            -maxdepth 1 -type f -name "*.geode"
-
-          test -n "$(find \
-            "${{ steps.build.outputs.build-output }}" \
-            -maxdepth 1 -type f -name "*.geode" -print -quit)"
-
-      - name: Upload Android64 artifact
+      - name: Upload Android64 mod
         uses: actions/upload-artifact@v4
         with:
-          name: MyMod-Android64
+          name: AnGeodeMod-Android64
           path: ${{ steps.build.outputs.build-output }}/*.geode
           if-no-files-found: error
           retention-days: 14
