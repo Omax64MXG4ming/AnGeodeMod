@@ -27,7 +27,8 @@ jobs:
           target: Android64
           sdk: given
           build-config: Release
-
+      - name: Install SDK binaries
+        run: geode sdk install-binaries
       - name: Verify output
         shell: bash
         run: |
