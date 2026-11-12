@@ -1,0 +1,28 @@
+name: Setup Tools
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Permite correrlo manualmente desde la pestaña Actions
+
+jobs:
+  instalar-y-ejecutar:
+    runs-on: ubuntu-latest # Máquina virtual con Ubuntu
+
+    steps:
+      # 1. Descarga tu código del repositorio
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      # 2. Actualiza la lista de paquetes e instala las herramientas
+      - name: Instalar Clang, LLVM, CMake y Git
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang clang-tools lld llvm cmake git
+
+      # 3. Verifica que se instalaron o corre tus comandos de compilación
+      - name: Verificar versiones y compilar
+        run: |
+          clang --version
+          cmake --version
+    
