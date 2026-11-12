@@ -24,11 +24,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang clang-tools lld llvm cmake git
 
-      # 4. Ejecuta tu compilación o script que genera los archivos
-      - name: Setup Files
-        run: |
-          mkdir -p build
-          clang main.c -o build/src
 
       # 5. Guarda y sube los archivos nuevos o modificados al repositorio
       - name: Push
