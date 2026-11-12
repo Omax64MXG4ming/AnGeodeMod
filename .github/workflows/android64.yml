@@ -1,3 +1,4 @@
+
 name: Build AnGeodeMod Android64
 
 on:
@@ -17,10 +18,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Clean Build Directory
-        run: |
-          rm -rf build
-          rm -rf .cache
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
@@ -28,9 +26,37 @@ jobs:
 
       - name: Install Android NDK
         run: |
-          sdkmanager --install "ndk;28.0.13004108"
+          sdkmanager --install "ndk;30.0.16248370"
 
-          $ANDROID_HOME/ndk/28.0.13004108/toolchains/llvm/prebuilt/linux-x86_64/bin/clang --version
+      - name: Verify C++20/23 Support
+        run: |
+          NDK="$ANDROID_HOME/ndk/30.0.16248370"
+          CXX="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
+
+          "$CXX" --version
+
+          cat > /tmp/check.cpp <<'EOF'
+          #include <atomic>
+          #include <type_traits>
+
+          int main() {
+              int value = 0;
+              std::atomic_ref<int> ref(value);
+
+              static_assert(
+                  std::is_trivially_default_constructible_v<int>
+              );
+
+              return ref.load();
+          }
+          EOF
+
+          "$CXX" \
+            --target=aarch64-none-linux-android23 \
+            -std=c++23 \
+            -fsyntax-only /tmp/check.cpp
+
+          echo "C++20/C++23 compatibility check passed!"
 
       - name: Build Geode Mod
         id: build
@@ -39,7 +65,7 @@ jobs:
           target: Android64
           sdk: nightly
           build-config: Release
-          android-ndk-version: 28.0.13004108
+          android-ndk-version: 30.0.16248370
           use-cpm-cache: false
 
       - name: Upload artifact
