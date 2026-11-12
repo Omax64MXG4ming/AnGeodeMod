@@ -3,26 +3,39 @@ name: Setup Tools
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # Permite correrlo manualmente desde la pestaña Actions
+  workflow_dispatch:
+
+# 1. Permisos necesarios para poder subir archivos al repositorio
+permissions:
+  contents: write
 
 jobs:
-  instalar-y-ejecutar:
-    runs-on: ubuntu-latest # Máquina virtual con Ubuntu
+  compilar-y-subir:
+    runs-on: ubuntu-latest
 
     steps:
-      # 1. Descarga tu código del repositorio
-      - name: Descargar repositorio
+      # 2. Descarga el código
+      - name: Download Repo
         uses: actions/checkout@v4
 
-      # 2. Actualiza la lista de paquetes e instala las herramientas
-      - name: Instalar Clang, LLVM, CMake y Git
+      # 3. Instala las herramientas
+      - name: Install Clang, LLVM, CMake and Git
         run: |
           sudo apt-get update
           sudo apt-get install -y clang clang-tools lld llvm cmake git
 
-      # 3. Verifica que se instalaron o corre tus comandos de compilación
-      - name: Verificar versiones y compilar
+      # 4. Ejecuta tu compilación o script que genera los archivos
+      - name: Setup Files
         run: |
-          clang --version
-          cmake --version
-    
+          mkdir -p build
+          clang main.c -o build/src
+
+      # 5. Guarda y sube los archivos nuevos o modificados al repositorio
+      - name: Push
+        run: |
+          git config --local user.email "github-actions[bot]@://github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          # Push Changes
+          git diff-index --quiet HEAD || git commit -m "chore: agregar archivos generados por workflow [skip ci]"
+          git push
