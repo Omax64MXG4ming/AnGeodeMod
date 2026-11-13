@@ -9,3 +9,48 @@
     "developer": "Omar Studios",
     "description": "My custom Geometry Dash mod."
 }
+
+"settings": {
+    "exit": {
+        "type": "bool",
+        "name": "Exit Button",
+        "description": "Show the exit button.",
+        "default": true
+    },
+    "restart": {
+        "type": "bool",
+        "name": "Restart Button",
+        "description": "Show the restart button.",
+        "default": true
+    },
+    "reload-textures": {
+        "type": "bool",
+        "name": "Reload Textures Button",
+        "description": "Show the texture reload button.",
+        "default": true
+    },
+    "size": {
+        "type": "float",
+        "name": "Button Size",
+        "description": "Changes the size of the menu buttons.",
+        "default": 1.0,
+        "min": 0.5,
+        "max": 2.0
+    },
+    "keybind_anywhere": {
+        "type": "bool",
+        "name": "Keybind Anywhere",
+        "description": "Allow keybinds outside the main menu, except the level editor.",
+        "default": true
+    },
+    "restart-keybind": {
+        "type": "keybind",
+        "name": "Restart Game Keybind",
+        "default": "Ctrl+Shift+R"
+    },
+    "reload-keybind": {
+        "type": "keybind",
+        "name": "Reload Textures Keybind",
+        "default": "Ctrl+Shift+T"
+    }
+}
