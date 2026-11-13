@@ -103,7 +103,7 @@ namespace neo::backend {
         auto request = web::WebRequest();
 
         // Geode 6 uses asp::Duration (milliseconds)
-        request.timeout(asp::Duration(20'000));
+        request.timeout(asp::Duration(20, 0));
 
         request.userAgent(
             "NeoBackend/1.0 GeometryDash/2.2091"
@@ -179,9 +179,8 @@ namespace neo::backend {
     ) {
 
         auto request = web::WebRequest();
-
         // Geode 6 uses asp::Duration (milliseconds)
-        request.timeout(asp::Duration(20'000));
+        request.timeout(asp::Duration(20, 0));
 
         request.userAgent(
             "NeoBackend/1.0 GeometryDash/2.2091"
