@@ -4,10 +4,10 @@
 using namespace geode::prelude;
 
 class $modify(MenuLayer) {
-	void onNews(CCObject*) {
+	void onFristStart(CCObject*) {
 		FLAlertLayer::create(
 			"Geode",
-			"Hello World from my Custom Mod!",
+			"V",
 			"OK"
 		)->show();
 	}
