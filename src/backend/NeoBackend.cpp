@@ -1,4 +1,3 @@
-
 #include "NeoBackend.hpp"
 
 #include <cctype>
@@ -74,37 +73,37 @@ namespace neo::backend {
     }
 
     void NeoBackend::get(
-        const std::string& endpoint,
-        Callback callback
-    ) {
-        auto request = web::WebRequest();
+    const std::string& endpoint,
+    Callback callback
+) {
+    auto request = web::WebRequest();
 
-        request.timeout(std::chrono::seconds(20));
-        request.userAgent("NeoBackend/1.0 GeometryDash/2.2091");
+    request.timeout(asp::Duration(20'000));
+    request.userAgent("NeoBackend/1.0 GeometryDash/2.2091");
 
-        async::spawn(
-            request.get(buildURL(endpoint)),
-            [callback = std::move(callback)](
-                web::WebResponse response
-            ) mutable {
-                NeoResponse result;
+    async::spawn(
+        request.get(buildURL(endpoint)),
+        [callback = std::move(callback)](
+            web::WebResponse response
+        ) mutable {
+            NeoResponse result;
 
-                result.httpCode = response.code();
-                result.success = response.ok();
-                result.body = response.string().unwrapOr("");
+            result.httpCode = response.code();
+            result.success = response.ok();
+            result.body = response.string().unwrapOr("");
 
-                if (!result.success) {
-                    result.error =
-                        "HTTP request failed: " +
-                        std::to_string(result.httpCode);
-                }
-
-                if (callback) {
-                    callback(std::move(result));
-                }
+            if (!result.success) {
+                result.error =
+                    "HTTP request failed: " +
+                    std::to_string(result.httpCode);
             }
-        );
-    }
+
+            if (callback) {
+                callback(std::move(result));
+            }
+        }
+    );
+}
 
     void NeoBackend::post(
         const std::string& endpoint,
