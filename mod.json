@@ -9,11 +9,11 @@
 	"developer": "Omar Studios",
 	"description": "Nah",
 	
-    "dependencies": [
-        {
-            "id": "geode.node-ids",
-            "version": "v1.10.0",
-            "importance": "required"
-        }
-    ]
+"dependencies": [
+    {
+        "id": "geode.node-ids",
+        "version": "*",
+        "importance": "required"
+    }
+]
 }
