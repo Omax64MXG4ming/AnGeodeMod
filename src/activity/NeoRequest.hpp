@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <cstdint>
+#include <chrono>
 
 namespace neo::intercept {
 
@@ -38,6 +39,8 @@ struct NeoRequest {
     std::string error;
 
     double durationMs = 0.0;
+
+    std::chrono::steady_clock::time_point startedAt{};
 };
 
 }
