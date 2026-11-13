@@ -1,19 +1,11 @@
 {
-	"geode": "6.0.0-alpha.1",
-	"gd": {
-    "android": "2.2091"
-	},
-	"id": "omarstudios.neo",
-	"name": "An Modls",
-	"version": "1.0.0",
-	"developer": "Omar Studios",
-	"description": "Nah",
-	
-"dependencies": [
-    {
-        "id": "geode.node-ids",
-        "version": "*",
-        "importance": "required"
-    }
-]
+    "geode": "6.0.0-alpha.1",
+    "gd": {
+        "android": "2.2091"
+    },
+    "id": "omarstudios.neo",
+    "name": "Neo Mod",
+    "version": "1.0.0",
+    "developer": "Omar Studios",
+    "description": "My custom Geometry Dash mod."
 }
