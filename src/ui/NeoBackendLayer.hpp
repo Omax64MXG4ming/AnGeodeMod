@@ -11,7 +11,10 @@
 
 class NeoBackendLayer : public cocos2d::CCLayer {
 protected:
-    std::atomic<bool> m_dirty{true};
+    #include <memory>
+
+std::shared_ptr<std::atomic<bool>> m_dirtySignal =
+    std::make_shared<std::atomic<bool>>(true);
 
     uint64_t m_listenerID = 0;
     uint64_t m_selectedID = 0;
