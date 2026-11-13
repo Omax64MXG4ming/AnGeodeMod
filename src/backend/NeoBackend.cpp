@@ -3,16 +3,22 @@
 #include <cctype>
 #include <sstream>
 #include <iomanip>
-#include <chrono>
+#include <utility>
 
 using namespace geode::prelude;
-
 namespace neo::backend {
+    // ==========================================
+    // SINGLETON
+    // ==========================================
 
     NeoBackend& NeoBackend::get() {
         static NeoBackend instance;
         return instance;
     }
+
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
 
     void NeoBackend::setBaseURL(std::string url) {
         while (!url.empty() && url.back() == '/') {
@@ -26,17 +32,24 @@ namespace neo::backend {
         return m_baseURL;
     }
 
+    // ==========================================
+    // URL BUILDER
+    // ==========================================
+
     std::string NeoBackend::buildURL(
         const std::string& endpoint
     ) const {
+
         if (endpoint.empty()) {
             return m_baseURL;
         }
 
+        // Absolute URL
         if (endpoint.find("://") != std::string::npos) {
             return endpoint;
         }
 
+        // Endpoint starting with /
         if (endpoint.front() == '/') {
             return m_baseURL + endpoint;
         }
@@ -44,14 +57,20 @@ namespace neo::backend {
         return m_baseURL + "/" + endpoint;
     }
 
+    // ==========================================
+    // URL ENCODING
+    // ==========================================
+
     std::string NeoBackend::encode(
         const std::string& value
     ) {
+
         std::ostringstream output;
 
         output << std::uppercase << std::hex;
 
         for (unsigned char c : value) {
+
             if (
                 std::isalnum(c) ||
                 c == '-' ||
@@ -72,47 +91,67 @@ namespace neo::backend {
         return output.str();
     }
 
+    // ==========================================
+    // GET REQUEST
+    // ==========================================
+
     void NeoBackend::get(
-    const std::string& endpoint,
-    Callback callback
-) {
-    auto request = web::WebRequest();
+        const std::string& endpoint,
+        Callback callback
+    ) {
 
-    request.timeout(asp::Duration(20'000));
-    request.userAgent("NeoBackend/1.0 GeometryDash/2.2091");
+        auto request = web::WebRequest();
 
-    async::spawn(
-        request.get(buildURL(endpoint)),
-        [callback = std::move(callback)](
-            web::WebResponse response
-        ) mutable {
-            NeoResponse result;
+        // Geode 6 uses asp::Duration (milliseconds)
+        request.timeout(asp::Duration(20'000));
 
-            result.httpCode = response.code();
-            result.success = response.ok();
-            result.body = response.string().unwrapOr("");
+        request.userAgent(
+            "NeoBackend/1.0 GeometryDash/2.2091"
+        );
 
-            if (!result.success) {
-                result.error =
-                    "HTTP request failed: " +
-                    std::to_string(result.httpCode);
+        async::spawn(
+            request.get(buildURL(endpoint)),
+
+            [
+                callback = std::move(callback)
+            ](web::WebResponse response) mutable {
+
+                NeoResponse result;
+
+                result.httpCode = response.code();
+                result.success = response.ok();
+
+                result.body =
+                    response.string().unwrapOr("");
+
+                if (!result.success) {
+
+                    result.error =
+                        "HTTP request failed: " +
+                        std::to_string(result.httpCode);
+                }
+
+                if (callback) {
+                    callback(std::move(result));
+                }
             }
+        );
+    }
 
-            if (callback) {
-                callback(std::move(result));
-            }
-        }
-    );
-}
+    // ==========================================
+    // POST REQUEST
+    // ==========================================
 
     void NeoBackend::post(
         const std::string& endpoint,
         const std::map<std::string, std::string>& fields,
         Callback callback
     ) {
+
         std::string body;
 
         for (const auto& [key, value] : fields) {
+
             if (!body.empty()) {
                 body += "&";
             }
@@ -122,18 +161,31 @@ namespace neo::backend {
             body += encode(value);
         }
 
-        postRaw(endpoint, body, std::move(callback));
+        postRaw(
+            endpoint,
+            body,
+            std::move(callback)
+        );
     }
+
+    // ==========================================
+    // RAW POST REQUEST
+    // ==========================================
 
     void NeoBackend::postRaw(
         const std::string& endpoint,
         const std::string& body,
         Callback callback
     ) {
+
         auto request = web::WebRequest();
 
-        request.timeout(std::chrono::seconds(20));
-        request.userAgent("NeoBackend/1.0 GeometryDash/2.2091");
+        // Geode 6 uses asp::Duration (milliseconds)
+        request.timeout(asp::Duration(20'000));
+
+        request.userAgent(
+            "NeoBackend/1.0 GeometryDash/2.2091"
+        );
 
         request.header(
             "Content-Type",
@@ -149,16 +201,21 @@ namespace neo::backend {
 
         async::spawn(
             request.post(buildURL(endpoint)),
-            [callback = std::move(callback)](
-                web::WebResponse response
-            ) mutable {
+
+            [
+                callback = std::move(callback)
+            ](web::WebResponse response) mutable {
+
                 NeoResponse result;
 
                 result.httpCode = response.code();
                 result.success = response.ok();
-                result.body = response.string().unwrapOr("");
+
+                result.body =
+                    response.string().unwrapOr("");
 
                 if (!result.success) {
+
                     result.error =
                         "HTTP request failed: " +
                         std::to_string(result.httpCode);
