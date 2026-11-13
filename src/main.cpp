@@ -266,6 +266,23 @@ $on_game(Loaded) {
     );
 }
 
+#include "backend/NeoBackend.hpp"
+
+using namespace geode::prelude;
+
+$on_mod(Loaded) {
+    log::info("[NeoBackend] Initializing NeoBackend 2.2091");
+
+    neo::backend::NeoBackend::get().setBaseURL(
+        "https://neops.x10.mx"
+    );
+
+    log::info(
+        "[NeoBackend] Base URL: {}",
+        neo::backend::NeoBackend::get().getBaseURL()
+    );
+}
+
 #include <Geode/modify/GauntletSelectLayer.hpp>//why u guys move this on top ever? - user95401
 class $modify(GauntletSelectLayerFix, GauntletSelectLayer) {
     $override void setupGauntlets() {
