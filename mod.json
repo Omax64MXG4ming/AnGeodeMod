@@ -8,7 +8,12 @@
 	"version": "1.0.0",
 	"developer": "Omar Studios",
 	"description": "Nah",
-	"dependencies": {
-		"geode.node-ids": ">=v1.23.3"
-	}
+	
+    "dependencies": [
+        {
+            "id": "geode.node-ids",
+            "version": "v1.10.0",
+            "importance": "required"
+        }
+    ]
 }
