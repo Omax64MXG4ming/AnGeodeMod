@@ -1,36 +1,135 @@
-name: Setup Tools
+name: Build AnGeodeMod Multi-Platform
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
-# 1. Permisos necesarios para poder subir archivos al repositorio
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  compilar-y-subir:
+  # =========================
+  # ANDROID ARM64
+  # =========================
+  android64:
+    name: Build Android ARM64
     runs-on: ubuntu-latest
 
     steps:
-      # 2. Descarga el código
-      - name: Download Repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # 3. Instala las herramientas
-      - name: Install Clang, LLVM, CMake and Git
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang clang-tools lld llvm cmake git
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
 
-
-      # 5. Guarda y sube los archivos nuevos o modificados al repositorio
-      - name: Push
+      - name: Install Android NDK
         run: |
-          git config --local user.email "github-actions[bot]@://github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          # Push Changes
-          git diff-index --quiet HEAD || git commit -m "chore: agregar archivos generados por workflow [skip ci]"
-          git push
+          sdkmanager --install "ndk;30.0.16248370"
+
+      - name: Verify C++20/23 Support
+        run: |
+          NDK="$ANDROID_HOME/ndk/30.0.16248370"
+          CXX="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
+
+          "$CXX" --version
+
+          cat > /tmp/check.cpp <<'EOF'
+          #include <atomic>
+          #include <type_traits>
+
+          int main() {
+              int value = 0;
+              std::atomic_ref<int> ref(value);
+
+              static_assert(
+                  std::is_trivially_default_constructible_v<int>
+              );
+
+              return ref.load();
+          }
+          EOF
+
+          "$CXX" \
+            --target=aarch64-none-linux-android23 \
+            -std=c++23 \
+            -fsyntax-only /tmp/check.cpp
+
+          echo "C++20/C++23 compatibility check passed!"
+
+      - name: Build Geode Mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: Android64
+          sdk: nightly
+          build-config: Release
+          android-ndk-version: 30.0.16248370
+          use-cpm-cache: false
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnGeodeMod-Android64
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
+          retention-days: 14
+
+  # =========================
+  # WINDOWS 64-BIT
+  # =========================
+  windows:
+    name: Build Windows 64-bit
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Geode Mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: Win64
+          sdk: nightly
+          build-config: Release
+          use-cpm-cache: false
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnGeodeMod-Windows
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
+          retention-days: 14
+
+  # =========================
+  # MACOS
+  # =========================
+  macos:
+    name: Build macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Geode Mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: MacOS
+          sdk: nightly
+          build-config: Release
+          use-cpm-cache: false
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnGeodeMod-macOS
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
+          retention-days: 14
