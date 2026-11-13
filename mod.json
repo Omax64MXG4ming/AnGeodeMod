@@ -2,7 +2,9 @@
 {
     "geode": "6.0.0-alpha.1",
     "gd": {
-        "android": "2.2091"
+        "win": "2.2091",
+		"android": "2.2091",
+		"mac": "2.2091"
     },
     "id": "omarstudios.neo",
     "name": "NeoPS Plus",
