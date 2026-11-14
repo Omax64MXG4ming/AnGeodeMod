@@ -1,4 +1,3 @@
-
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/GauntletSelectLayer.hpp>
@@ -330,16 +329,24 @@ $on_game(Loaded) {
 
 $on_mod(Loaded) {
 
-    log::info("[NeoBackend] Initializing NeoBackend 2.2091");
+    neo::backend::NeoBackend::get().get(
+    "/",
+    [](neo::backend::NeoResponse response) {
+        if (!response.success) {
+            log::error(
+                "[NeoBackend] Request failed: {}",
+                response.error
+            );
+            return;
+        }
 
-    neo::backend::NeoBackend::get().setBaseURL(
-        "https://neops.x10.mx"
-    );
+        log::info(
+            "[NeoBackend] HTTP {}",
+            response.httpCode
+        );
+    }
+);
 
-    log::info(
-        "[NeoBackend] Base URL: {}",
-        neo::backend::NeoBackend::get().getBaseURL()
-    );
 }
 
 // --------------------------------------------------
