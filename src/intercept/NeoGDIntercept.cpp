@@ -1,4 +1,3 @@
-#include "NeoGDHttpClient.hpp"
 #include "NeoGDIntercept.hpp"
 #include "../activity/NeoActivityManager.hpp"
 
