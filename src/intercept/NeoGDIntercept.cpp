@@ -1,3 +1,4 @@
+
 #include "NeoGDIntercept.hpp"
 #include "../activity/NeoActivityManager.hpp"
 
@@ -63,7 +64,7 @@ std::string sanitizeFormBody(const std::string& body) {
     return result;
 }
 
-}
+} // namespace anónimo
 
 std::map<std::string, std::string>
 NeoGDIntercept::sanitizeHeaders(
@@ -85,8 +86,6 @@ std::string NeoGDIntercept::sanitizeBody(
     if (body.empty())
         return {};
 
-    // No guardamos JSON sin un parser que permita
-    // identificar y ocultar sus campos sensibles.
     size_t first = body.find_first_not_of(" \t\r\n");
 
     if (first != std::string::npos && body[first] == '{')
@@ -131,4 +130,4 @@ void NeoGDIntercept::requestFailed(
     NeoActivityManager::get().fail(requestID, error);
 }
 
-}
+} // namespace neo::intercept
