@@ -1,7 +1,7 @@
-#pragma once
+#include "NeoGDHttpClient.hpp"
+#include "NeoGDIntercept.hpp"
 
-#include <Geode/Geode.hpp>
-#include <Geode/modify/CCHttpClient.hpp>
+using namespace cocos2d::extension;
 
 namespace neo::intercept {
 
