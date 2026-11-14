@@ -63,7 +63,7 @@ std::string sanitizeFormBody(const std::string& body) {
     return result;
 }
 
-} // namespace anónimo
+} // namespace
 
 std::map<std::string, std::string>
 NeoGDIntercept::sanitizeHeaders(
