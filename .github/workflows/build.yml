@@ -92,35 +92,9 @@ jobs:
       - name: Inspect CCHttpClient Implementation
         if: matrix.config.target == 'Android64'
         shell: bash
-        run: |
-          BASE="build/bindings/bindings/Geode"
-
-          echo "=== CCHttpClient modify header ==="
-          sed -n '1,180p' "$BASE/modify/CCHttpClient.hpp"
-
-          echo ""
-          echo "=== CCHttpClient binding source ==="
-          sed -n '1,180p' "$BASE/source/CCHttpClient.cpp"
-
-          echo ""
-          echo "=== CCHttpResponse modify header ==="
-          if [ -f "$BASE/modify/CCHttpResponse.hpp" ]; then
-            sed -n '1,180p' "$BASE/modify/CCHttpResponse.hpp"
-          fi
-
-          echo ""
-          echo "=== HttpClient implementation files ==="
-          find geode-sdk-clone -type f \
-            \( -iname '*HttpClient*.cpp' -o -iname '*HttpClient*.h' \) \
-            -print
-
-          echo ""
-          echo "=== Response queue references ==="
-          grep -R -n -E \
-            'dispatchResponseCallbacks|_responseQueue|responseQueue|CCHttpResponse' \
-            geode-sdk-clone/loader/include/Geode/cocos \
-            geode-sdk-clone/loader/src \
-            2>/dev/null | head -200 || true
+        run: | 
+        cat build/bindings/bindings/Geode/modify/CCHttpClient.hpp
+          
   # Combine all platforms
   package:
     name: Combine Multi-Platform Builds
