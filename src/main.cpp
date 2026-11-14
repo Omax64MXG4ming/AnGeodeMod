@@ -1,6 +1,12 @@
+
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
+#include <Geode/modify/GauntletSelectLayer.hpp>
 #include <Geode/loader/SettingV3.hpp>
+
+#include "backend/NeoBackend.hpp"
+#include "intercept/NeoGDIntercept.hpp"
+#include "ui/NeoBackendLayer.hpp"
 
 using namespace geode::prelude;
 
@@ -81,7 +87,10 @@ class $modify(AltMenuLayer, MenuLayer) {
 
         auto winSize = CCDirector::get()->getWinSize();
 
-        // Create button container
+        // ------------------------------------------
+        // BUTTON CONTAINER
+        // ------------------------------------------
+
         auto menu = this->getChildByID("close-menu");
 
         if (!menu) {
@@ -201,6 +210,44 @@ class $modify(AltMenuLayer, MenuLayer) {
         menu->setScale(static_cast<float>(scale));
         menu->updateLayout();
 
+        // ------------------------------------------
+        // NEO INSPECTOR BUTTON
+        // ------------------------------------------
+
+        if (!this->getChildByID("neo-inspector-menu")) {
+
+            auto inspectorSprite = ButtonSprite::create(
+                "NEO INSPECTOR",
+                "goldFont.fnt",
+                "GJ_button_01.png",
+                0.65f
+            );
+
+            if (inspectorSprite) {
+
+                auto inspectorButton = CCMenuItemSpriteExtra::create(
+                    inspectorSprite,
+                    this,
+                    menu_selector(AltMenuLayer::onNeoInspector)
+                );
+
+                if (inspectorButton) {
+
+                    auto inspectorMenu = CCMenu::create();
+                    inspectorMenu->setID("neo-inspector-menu");
+
+                    inspectorMenu->addChild(inspectorButton);
+
+                    inspectorMenu->setPosition(
+                        winSize.width - 95.f,
+                        35.f
+                    );
+
+                    this->addChild(inspectorMenu, 100);
+                }
+            }
+        }
+
         return true;
     }
 
@@ -215,6 +262,11 @@ class $modify(AltMenuLayer, MenuLayer) {
     void onReload(CCObject*) {
         reload();
     }
+
+    void onNeoInspector(CCObject*) {
+        log::info("[NeoInspector] Opening Inspector");
+        NeoBackendLayer::open();
+    }
 };
 
 // --------------------------------------------------
@@ -223,7 +275,10 @@ class $modify(AltMenuLayer, MenuLayer) {
 
 $on_game(Loaded) {
 
-    // Restart keybind
+    // ----------------------------------------------
+    // RESTART KEYBIND
+    // ----------------------------------------------
+
     listenForKeybindSettingPresses(
         "restart-keybind",
         [](Keybind const& keybind, bool down, bool repeat, double timestamp) {
@@ -244,7 +299,10 @@ $on_game(Loaded) {
         }
     );
 
-    // Reload textures keybind
+    // ----------------------------------------------
+    // RELOAD TEXTURES KEYBIND
+    // ----------------------------------------------
+
     listenForKeybindSettingPresses(
         "reload-keybind",
         [](Keybind const& keybind, bool down, bool repeat, double timestamp) {
@@ -266,11 +324,12 @@ $on_game(Loaded) {
     );
 }
 
-#include "backend/NeoBackend.hpp"
-#include "intercept/NeoGDIntercept.hpp"
-using namespace geode::prelude;
+// --------------------------------------------------
+// NEO BACKEND INITIALIZATION
+// --------------------------------------------------
 
 $on_mod(Loaded) {
+
     log::info("[NeoBackend] Initializing NeoBackend 2.2091");
 
     neo::backend::NeoBackend::get().setBaseURL(
@@ -283,17 +342,31 @@ $on_mod(Loaded) {
     );
 }
 
-#include <Geode/modify/GauntletSelectLayer.hpp>//why u guys move this on top ever? - user95401
+// --------------------------------------------------
+// GAUNTLET SELECT FIX
+// --------------------------------------------------
+
 class $modify(GauntletSelectLayerFix, GauntletSelectLayer) {
+
     $override void setupGauntlets() {
+
         GauntletSelectLayer::setupGauntlets();
-        findFirstChildRecursive<ExtendedLayer>(this,
+
+        findFirstChildRecursive<ExtendedLayer>(
+            this,
             [](ExtendedLayer* gauntlet_pages) {
-                if (gauntlet_pages->getChildrenCount() > 1) return false;
-                gauntlet_pages->setAnchorPoint(CCPointMake(1.f, 0.f));
+
+                if (gauntlet_pages->getChildrenCount() > 1)
+                    return false;
+
+                gauntlet_pages->setAnchorPoint(
+                    CCPointMake(1.f, 0.f)
+                );
+
                 gauntlet_pages->ignoreAnchorPointForPosition(false);
+
                 return true;
             }
         );
-    };
+    }
 };
