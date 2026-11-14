@@ -267,7 +267,7 @@ $on_game(Loaded) {
 }
 
 #include "backend/NeoBackend.hpp"
-
+#include "intercept/NeoGDIntercept.hpp"
 using namespace geode::prelude;
 
 $on_mod(Loaded) {
