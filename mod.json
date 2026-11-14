@@ -10,7 +10,7 @@
     "name": "NeoPS Plus",
     "version": "1.0.0",
     "developer": "Omar Studios",
-    "description": "An Mod For Neo PS",
+    "description": "An Mod For Neo PS, Uses Backend and More Inspector",
     "settings": {
         "exit": {
             "type": "bool",
