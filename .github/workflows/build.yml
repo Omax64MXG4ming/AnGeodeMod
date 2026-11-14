@@ -77,6 +77,22 @@ jobs:
             -std=c++23 \
             -fsyntax-only /tmp/check.cpp
 
+      - name: Inspect Geode HTTP API
+        shell: bash
+        run: |
+          echo "=== CCHttpClient / CCHttpRequest ==="
+          grep -R -n -E \
+            "class CCHttpClient|class CCHttpRequest" \
+            geode-sdk-clone/ || true
+
+          echo ""
+          echo "=== HTTP request / response methods ==="
+          grep -R -n -E \
+            "sendRequest|onResponse|CCHttpResponse|send\\(" \
+            geode-sdk-clone/loader/include/ \
+            geode-sdk-clone/loader/src/ || true
+
+
       # Build
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
