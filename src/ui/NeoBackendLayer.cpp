@@ -1,4 +1,3 @@
-
 #include "NeoBackendLayer.hpp"
 
 #include <algorithm>
@@ -231,20 +230,17 @@ bool NeoBackendLayer::init() {
 
     // Initial history
 
-    m_listenerID =
-        NeoActivityManager::get().addListener(
-            [this]() {
-                m_dirty.store(true);
+std::weak_ptr<std::atomic<bool>> weakDirty = m_dirtySignal;
+
+m_listenerID =
+    NeoActivityManager::get().addListener(
+        [weakDirty]() {
+            if (auto dirty = weakDirty.lock()) {
+                dirty->store(true);
             }
-        );
-
-    scheduleUpdate();
-
-    refreshList();
-
-    return true;
-}
-
+        }
+    );
+    
 // ==========================================
 // UPDATE
 // ==========================================
@@ -252,7 +248,7 @@ bool NeoBackendLayer::init() {
 void NeoBackendLayer::update(float dt) {
     CCLayer::update(dt);
 
-    if (m_dirty.exchange(false)) {
+    if (m_dirtySignal && m_dirtySignal->exchange(false)) {
         refreshList();
         refreshDetails();
     }
@@ -483,22 +479,22 @@ void NeoBackendLayer::onSelectRequest(
 
 void NeoBackendLayer::onFilterAll(CCObject*) {
     m_filter = 0;
-    m_dirty.store(true);
+    m_dirtySignal->store(true);;
 }
 
 void NeoBackendLayer::onFilterNeo(CCObject*) {
     m_filter = 1;
-    m_dirty.store(true);
+    m_dirtySignal->store(true);;
 }
 
 void NeoBackendLayer::onFilterGD(CCObject*) {
     m_filter = 2;
-    m_dirty.store(true);
+    m_dirtySignal->store(true);;
 }
 
 void NeoBackendLayer::onFilterGeode(CCObject*) {
     m_filter = 3;
-    m_dirty.store(true);
+    m_dirtySignal->store(true);;
 }
 
 // ==========================================
@@ -521,7 +517,7 @@ void NeoBackendLayer::onExit() {
 
         m_listenerID = 0;
     }
-
+m_dirtySignal.reset();
     CCLayer::onExit();
 }
 
