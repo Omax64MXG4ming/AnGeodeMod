@@ -89,28 +89,28 @@ jobs:
           use-cpm-cache: false
           combine: true
 
-
-      - name: Inspect Native Cocos HTTP Headers
+      - name: Inspect CCHttpClient Bindings
         if: matrix.config.target == 'Android64'
         shell: bash
         run: |
-          BASE="geode-sdk-clone/loader/include/Geode/cocos/extensions/network"
+          BASE="build/bindings/bindings/Geode"
 
-          echo "========== HTTP CLIENT =========="
-          if [ -f "$BASE/HttpClient.h" ]; then
-            cat "$BASE/HttpClient.h"
-          else
-            echo "HttpClient.h not found"
-          fi
+          echo "=== CCHttpClient files ==="
+          find "$BASE" -iname "*CCHttpClient*" -o -iname "*CCHttpResponse*"
 
           echo ""
-          echo "========== HTTP REQUEST =========="
-          sed -n '1,330p' "$BASE/HttpRequest.h"
+          echo "=== CCHttpClient references ==="
+          grep -R -n "CCHttpClient" \
+            "$BASE/modify/" \
+            "$BASE/binding/" \
+            "$BASE/source/" 2>/dev/null || true
 
           echo ""
-          echo "========== HTTP RESPONSE =========="
-          sed -n '1,260p' "$BASE/HttpResponse.h"
-
+          echo "=== dispatchResponseCallbacks ==="
+          grep -R -n -A 12 -B 8 \
+            "dispatchResponseCallbacks" \
+            build/bindings/ \
+            geode-sdk-clone/loader/ 2>/dev/null || true
   # Combine all platforms
   package:
     name: Combine Multi-Platform Builds
