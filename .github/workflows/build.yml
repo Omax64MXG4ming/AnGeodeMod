@@ -89,49 +89,27 @@ jobs:
           use-cpm-cache: false
           combine: true
 
-      # Inspect Geode HTTP API
-      - name: Inspect Geode HTTP API
+
+      - name: Inspect Native Cocos HTTP Headers
         if: matrix.config.target == 'Android64'
         shell: bash
         run: |
-          echo "======================================"
-          echo "       GEODE SDK HTTP INSPECTION"
-          echo "======================================"
+          BASE="geode-sdk-clone/loader/include/Geode/cocos/extensions/network"
+
+          echo "========== HTTP CLIENT =========="
+          if [ -f "$BASE/HttpClient.h" ]; then
+            cat "$BASE/HttpClient.h"
+          else
+            echo "HttpClient.h not found"
+          fi
 
           echo ""
-          echo "=== Workspace ==="
-          pwd
-          ls -la
+          echo "========== HTTP REQUEST =========="
+          sed -n '1,330p' "$BASE/HttpRequest.h"
 
           echo ""
-          echo "=== SDK headers ==="
-          find "$GITHUB_WORKSPACE" \
-            -type f \
-            \( -name "web.hpp" -o -name "Event.hpp" \) \
-            -print 2>/dev/null || true
-
-          echo ""
-          echo "=== CCHttpClient / CCHttpRequest ==="
-          grep -R -n -E \
-            "class CCHttpClient|class CCHttpRequest" \
-            "$GITHUB_WORKSPACE" \
-            --include="*.hpp" \
-            --include="*.h" \
-            --include="*.cpp" || true
-
-          echo ""
-          echo "=== HTTP request / response methods ==="
-          grep -R -n -E \
-            "sendRequest|onResponse|CCHttpResponse" \
-            "$GITHUB_WORKSPACE" \
-            --include="*.hpp" \
-            --include="*.h" \
-            --include="*.cpp" || true
-
-          echo ""
-          echo "======================================"
-          echo "          INSPECTION FINISHED"
-          echo "======================================"
+          echo "========== HTTP RESPONSE =========="
+          sed -n '1,260p' "$BASE/HttpResponse.h"
 
   # Combine all platforms
   package:
