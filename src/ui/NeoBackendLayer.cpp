@@ -230,6 +230,8 @@ bool NeoBackendLayer::init() {
 
     // Initial history
 
+// Initial history
+
 std::weak_ptr<std::atomic<bool>> weakDirty = m_dirtySignal;
 
 m_listenerID =
@@ -240,6 +242,13 @@ m_listenerID =
             }
         }
     );
+
+m_dirtySignal->store(true);
+
+scheduleUpdate();
+
+return true;
+}
     
 // ==========================================
 // UPDATE
@@ -438,7 +447,7 @@ void NeoBackendLayer::refreshDetails() {
             << "\n\n";
 
     details << "RESPONSE BODY:\n"
-            << shorten(request.responseBody, 500);
+        << shorten(request.responseBody, 500);
 
     if (!request.error.empty()) {
         details << "\n\nERROR:\n"
@@ -479,22 +488,22 @@ void NeoBackendLayer::onSelectRequest(
 
 void NeoBackendLayer::onFilterAll(CCObject*) {
     m_filter = 0;
-    m_dirtySignal->store(true);;
+    m_dirtySignal->store(true);
 }
 
 void NeoBackendLayer::onFilterNeo(CCObject*) {
     m_filter = 1;
-    m_dirtySignal->store(true);;
+    m_dirtySignal->store(true);
 }
 
 void NeoBackendLayer::onFilterGD(CCObject*) {
     m_filter = 2;
-    m_dirtySignal->store(true);;
+    m_dirtySignal->store(true);
 }
 
 void NeoBackendLayer::onFilterGeode(CCObject*) {
     m_filter = 3;
-    m_dirtySignal->store(true);;
+    m_dirtySignal->store(true);
 }
 
 // ==========================================
@@ -517,7 +526,9 @@ void NeoBackendLayer::onExit() {
 
         m_listenerID = 0;
     }
-m_dirtySignal.reset();
+
+    m_dirtySignal.reset();
+
     CCLayer::onExit();
 }
 
